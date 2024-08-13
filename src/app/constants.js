@@ -1,0 +1,1 @@
+export const Books_Par_Page =6;
