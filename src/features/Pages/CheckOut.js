@@ -78,6 +78,8 @@ export default function Checkout() {
       deliveryCharge,
       status: "pending",
     };
+    console.log(order)
+    localStorage.setItem("orders", JSON.stringify(order))
     dispatch(createOrderAsync(order));
   };
 

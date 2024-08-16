@@ -5,12 +5,50 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectLoginInUser } from "../Auth/Components/AuthSlice";
 import { resetOrder } from "../Orders/OrdersSlice";
 import logo from "../../assets/logo/mainlogo.png"
+import { selectUsersOrder } from "../UserPannel/User/UserSlice";
 function OrderDone() {
   const dispatch = useDispatch();
   const params = useParams();
   const user = useSelector(selectLoginInUser);
+  const paymentMethod= JSON.parse(localStorage.getItem("orders")).paymentMethod || "";
+  console.log(paymentMethod)
+
+  async function onlinePayment() {
+    try { 
+      const response = await fetch("http://localhost:8080/orders/online-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: params.id }), // Wrap the id in an object
+      });
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if(data.url){
+        localStorage.removeItem("orders");
+        window.location.replace(data.url)
+      }
+    } catch (error) {
+      console.error("Error during online payment:", error);
+    }
+  }
+
+
+  // const onlinePayment = async() =>{
+  //   const response = await fetch("http://localhost:8080/orders/online-payment", {
+  //     method: "POST",
+  //     body: JSON.stringify(params.id),
+  //     headers: { "content-type": "application/json" },
+  //   });
+
+  // }
   
-  useEffect(() => {
+  useEffect( () => {
+    if(paymentMethod ==="Online Payment"){
+      onlinePayment();
+    }
     dispatch(resetCartAsync(user.id));
     dispatch(resetOrder());
   }, [dispatch, user]);
@@ -39,9 +77,9 @@ function OrderDone() {
             </div>
             <div className="ml-3">
               <h3 className="text-sm font-medium text-green-800">Order Confirmed</h3>
-              <div className="mt-2 text-lg text-green-700">
-                <p>Your order number is: <span className="font-bold  text-xl">#{params.id}</span></p>
-              </div>
+              {/* <div className="mt-2 text-lg text-green-700">
+                <p>Your order number is: <span className="font-bold  text-xl">#{params?.id}</span></p>
+              </div> */}
             </div>
           </div>
         </div>
