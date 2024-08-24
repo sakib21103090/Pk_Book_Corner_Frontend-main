@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { FaPlus, FaMinus } from "react-icons/fa6";
+import { FaPlus, FaMinus } from "react-icons/fa";
 import {
   deleteItemFromCartAsync,
   selectCartItems,
@@ -11,7 +11,6 @@ import Swal from "sweetalert2";
 
 export default function Cart() {
   const items = useSelector(selectCartItems);
-  console.log(items);
   const dispatch = useDispatch();
   const [open, setOpen] = useState(true);
 
@@ -20,8 +19,9 @@ export default function Cart() {
   };
 
   const handleRemove = (id) => {
-    dispatch(deleteItemFromCartAsync(id));
-    Swal.fire("Removed", "Book has been removed from the cart", "success");
+    dispatch(deleteItemFromCartAsync(id))
+      .then(() => Swal.fire("Removed", "Book has been removed from the cart", "success"))
+      .catch((error) => Swal.fire("Error", "Failed to remove book from cart", "error"));
   };
 
   const Subtotal = items.reduce((amount, item) => {
@@ -29,11 +29,12 @@ export default function Cart() {
       ? Math.round(
           item.product.price * (1 - item.product.discountPercentage / 100)
         )
-      : item?.product?.price || 0; // Default to 0 if price is undefined
-     return amount + price * item.quantity;// Default to quantity 1 if undefined
+      : item?.product?.price || 0;
+    return amount + price * item.quantity;
   }, 0);
 
   const totalItems = items.reduce((total, item) => item.quantity + total, 0);
+
   return (
     <div className="mx-auto mt-12 max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="shadow-xl rounded-lg p-6 bg-yellow-50">
@@ -112,7 +113,7 @@ export default function Cart() {
                       <div className="flex">
                         <button
                           onClick={() => {
-                            handleRemove(items.id);
+                            handleRemove(item.id);
                           }}
                           type="button"
                           className="font-medium text-white bg-indigo-600 hover:bg-indigo-500 transition-colors px-4 py-2 rounded-full shadow-md"

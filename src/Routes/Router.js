@@ -20,6 +20,8 @@ import AddProduct from "../features/UserPannel/Admin/AddProduct";
 import ManageProduct from "../features/UserPannel/Admin/ManageProduct";
 import EditPage from "../features/UserPannel/Admin/AdminEdit/EditPage";
 import AdminOrderPage from "../features/UserPannel/Admin/AdminOrder/AdminOrderPage";
+import AddCategory from "../features/UserPannel/Admin/AddCategory";
+import AddAuthor from "../features/UserPannel/Admin/AddAuthorName";
 
 
 export const router = createBrowserRouter([
@@ -86,6 +88,15 @@ export const router = createBrowserRouter([
       {
         path: "addProduct",
         element: <AddProduct></AddProduct>,
+      },
+      {
+        path: "addCategory",
+        element: <AddCategory></AddCategory>,
+      },
+      
+      {
+        path: "addAuthor",
+        element: <AddAuthor></AddAuthor>,
       },
       
       {

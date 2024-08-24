@@ -7,6 +7,8 @@ import {
   fetchProductsById,
   createProduct,
   deleteProduct,
+  createCategory,
+  createAuthorName,
 } from "./BooksListApi";
 
 const initialState = {
@@ -66,6 +68,22 @@ export const createProductAsync = createAsyncThunk(
     return response.data;
   }
 );
+export const createCategoryAsync = createAsyncThunk(
+  "category/createCategory",
+  async (category) => {
+    const response = await createCategory(category);
+    // The value we return becomes the `fulfilled` action payload
+    return response.data;
+  }
+);
+export const createAuthorNameAsync = createAsyncThunk(
+  "authorName/createAuthorName",
+  async (authorName) => {
+    const response = await createAuthorName(authorName);
+    // The value we return becomes the `fulfilled` action payload
+    return response.data;
+  }
+);
 
 export const deleteProductAsync = createAsyncThunk(
   "cart/deleteItemFromCart",
@@ -115,6 +133,7 @@ export const BooksSlice = createSlice({
       .addCase(fetchCategoryAsync.fulfilled, (state, action) => {
         state.status = "idle";
         state.category = action.payload;
+        console.log(state.category)
       })
       // for fetch books by id
       .addCase(fetchProductsByIdAsync.pending, (state) => {
@@ -131,6 +150,22 @@ export const BooksSlice = createSlice({
       .addCase(createProductAsync.fulfilled, (state, action) => {
         state.status = "idle";
         state.products.push(action.payload);
+      })
+      // create category
+      .addCase(createCategoryAsync.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(createCategoryAsync.fulfilled, (state, action) => {
+        state.status = "idle";
+        state.category.push(action.payload);
+      })
+      // create authorName
+      .addCase(createAuthorNameAsync.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(createAuthorNameAsync.fulfilled, (state, action) => {
+        state.status = "idle";
+        state.AuthorName.push(action.payload);
       })
       // delete product
       .addCase(deleteProductAsync.pending, (state) => {

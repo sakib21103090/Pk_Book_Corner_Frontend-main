@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import {
+  deleteOrderAsync,
   fetchAllOrdersAsync,
   selectAllOrders,
   updateOrderAsync,
 } from "../../../Orders/OrdersSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { EyeIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import Swal from "sweetalert2";
 
 const AdminOrder = () => {
   const dispatch = useDispatch();
@@ -34,7 +36,11 @@ const AdminOrder = () => {
     dispatch(updateOrderAsync(updatedOrder));
     setEditableOrderId(-1);
   };
-  
+  const handleRemove = (id) => {
+    dispatch(deleteOrderAsync(id))
+      .then(() => Swal.fire("Removed", "order has been delete ", "success"))
+      .catch((error) => Swal.fire("Error", "Failed to remove order", "error"));
+  };
   const chooseColor = (status) => {
     switch (status) {
       case "pending":
@@ -143,7 +149,11 @@ const AdminOrder = () => {
                         className="w-5 h-5 cursor-pointer text-green-500 hover:text-green-700 transition-colors"
                         onClick={() => handleEdit(order)}
                       />
-                      <TrashIcon className="w-5 h-5 cursor-pointer text-red-500 hover:text-red-700 transition-colors" />
+                      <TrashIcon className="w-5 h-5 cursor-pointer text-red-500 hover:text-red-700 transition-colors"
+                       onClick={() => {
+                            handleRemove(order.id);
+                          }}
+                       />
                     </div>
                   </td>
                 </tr>

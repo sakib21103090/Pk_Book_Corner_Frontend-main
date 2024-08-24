@@ -6,6 +6,7 @@ import { selectUserInfo } from '../User/UserSlice';
 
 export default function AdminProfile() {
   const user = useSelector(selectUserInfo);
+  console.log(user)
 
 
   return (
@@ -13,7 +14,7 @@ export default function AdminProfile() {
     <div className="text-center">
       <img
         className="mx-auto h-24 w-24 rounded-full border-4 border-indigo-500 shadow-lg"
-        src={user?.photoUrl}
+        src={user?.photo}
         alt="User"
       />
       <h2 className="mt-6 text-3xl font-bold text-indigo-900">

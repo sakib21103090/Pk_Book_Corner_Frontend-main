@@ -53,6 +53,7 @@ export const UserSlice = createSlice({
         state.status = 'idle';
         // store all the address with user information 
         state.userOrders = action.payload;
+        console.log(state.userOrders)
       })
       .addCase(UpdateUserAsync.pending, (state) => {
         state.status = 'loading';

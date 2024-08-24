@@ -1,44 +1,35 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { CreateUser, LoginUser, SignOut } from './AuthAPI';
-// import { UpdateUserCheckOut } from "../../UserPannel/User/UserAPI";
+
+// Load user from localStorage if available
+const savedUser = JSON.parse(localStorage.getItem('user'));
 
 const initialState = {
-  loginInUser: null,
+  loginInUser: savedUser || null,
   status: 'idle',
-  error:null
+  error: null,
 };
 
 export const createUserAsync = createAsyncThunk(
   'user/createUser',
   async (userData) => {
     const response = await CreateUser(userData);
-    // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
 );
-// export const UpdateUserCheckOutAsync = createAsyncThunk(
-//   'user/UpdateUserCheckOut',
-//   async (update) => {
-//     const response = await UpdateUserCheckOut(update);
-//     // The value we return becomes the `fulfilled` action payload
-//     return response.data;
-//   }
-// );
-// check==Login
+
 export const LoginUserAsync = createAsyncThunk(
   'user/LoginUser',
   async (LogInfo) => {
     const response = await LoginUser(LogInfo);
-    // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
 );
-// signOut
+
 export const signOutAsync = createAsyncThunk(
   'user/signOut',
-  async (LogInfo) => {
-    const response = await SignOut(LogInfo);
-    // The value we return becomes the `fulfilled` action payload
+  async () => {
+    const response = await SignOut();
     return response.data;
   }
 );
@@ -46,15 +37,7 @@ export const signOutAsync = createAsyncThunk(
 export const AuthSlice = createSlice({
   name: 'user',
   initialState,
-  
-  reducers: {
-    increment: (state) => {
-     
-      state.value += 1;
-    },
-   
-  },
-  
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(createUserAsync.pending, (state) => {
@@ -63,6 +46,7 @@ export const AuthSlice = createSlice({
       .addCase(createUserAsync.fulfilled, (state, action) => {
         state.status = 'idle';
         state.loginInUser = action.payload;
+        localStorage.setItem('user', JSON.stringify(action.payload)); // Save user to localStorage
       })
       .addCase(LoginUserAsync.pending, (state) => {
         state.status = 'loading';
@@ -70,28 +54,20 @@ export const AuthSlice = createSlice({
       .addCase(LoginUserAsync.fulfilled, (state, action) => {
         state.status = 'idle';
         state.loginInUser = action.payload;
+        localStorage.setItem('user', JSON.stringify(action.payload)); // Save user to localStorage
       })
       .addCase(LoginUserAsync.rejected, (state, action) => {
         state.status = 'idle';
-        state.error = action.error;
+        state.error = action.error.message;
       })
-      // // update user for checkout
-      // .addCase(UpdateUserCheckOutAsync.pending, (state) => {
-      //   state.status = 'loading';
-      // })
-      // .addCase(UpdateUserCheckOutAsync.fulfilled, (state, action) => {
-      //   state.status = 'idle';
-      //   state.loginInUser = action.payload;
-      // })
-        // signOut user for checkout
-        .addCase(signOutAsync.pending, (state) => {
-          state.status = 'loading';
-        })
-        .addCase(signOutAsync.fulfilled, (state, action) => {
-          state.status = 'idle';
-          state.loginInUser = null;
-        })
-    
+      .addCase(signOutAsync.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(signOutAsync.fulfilled, (state) => {
+        state.status = 'idle';
+        state.loginInUser = null;
+        localStorage.removeItem('user'); // Remove user from localStorage
+      });
   },
 });
 

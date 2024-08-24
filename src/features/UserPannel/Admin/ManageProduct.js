@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { deleteProductAsync, selectAllProducts } from '../../BookList/Components/BooksSlice';
 import Swal from "sweetalert2";
-import { Link } from 'react-router-dom';
 
 export default function ManageProduct() {
   const dispatch = useDispatch();
@@ -11,7 +10,7 @@ export default function ManageProduct() {
 
   const handleDelete = (id) => {
     dispatch(deleteProductAsync(id));
-    Swal.fire("Removed", "Book has been removed from the cart", "success");
+    Swal.fire("Delete", "Book has been deleted", "success");
   };
 
   const handleShowMore = () => {

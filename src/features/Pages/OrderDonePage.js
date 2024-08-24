@@ -77,9 +77,9 @@ function OrderDone() {
             </div>
             <div className="ml-3">
               <h3 className="text-sm font-medium text-green-800">Order Confirmed</h3>
-              {/* <div className="mt-2 text-lg text-green-700">
-                <p>Your order number is: <span className="font-bold  text-xl">#{params?.id}</span></p>
-              </div> */}
+              <div className="mt-2 text-lg text-green-700">
+                <p>Your order number is: <span className="font-bold  text-xl">#{params.id}</span></p>
+              </div>
             </div>
           </div>
         </div>

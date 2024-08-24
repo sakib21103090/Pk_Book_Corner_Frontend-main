@@ -13,12 +13,11 @@ const initialState = {
   cartLoaded: false,
 };
 
+// Async thunks for cart operations
 export const addToCartAsync = createAsyncThunk(
   "cart/addToCart",
   async (item) => {
     const response = await addToCart(item);
-    // You might want to use a proper alert library or handle this differently
-    console.log("Item Added to Cart");
     return response.data;
   }
 );
@@ -27,39 +26,44 @@ export const fetchItemsByUserIdAsync = createAsyncThunk(
   "cart/fetchItemsByUserId",
   async (userId) => {
     const response = await fetchItemsByUserId(userId);
-    // The value we return becomes the `fulfilled` action payload
-    return response.data;
-  }
-);
-export const updateCartAsync = createAsyncThunk(
-  "cart/updateCart",
-  async (update) => {
-    const response = await updateCart(update);
-    // The value we return becomes the `fulfilled` action payload
-    return response.data;
-  }
-);
-export const deleteItemFromCartAsync = createAsyncThunk(
-  "cart/deleteItemFromCart",
-  async (itemId) => {
-    const response = await deleteItemFromCart(itemId);
-    // The value we return becomes the `fulfilled` action payload
-    return response.data;
-  }
-);
-export const resetCartAsync = createAsyncThunk(
-  "cart/resetCart",
-  async (userId) => {
-    const response = await resetCart(userId);
-    // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
 );
 
+export const updateCartAsync = createAsyncThunk(
+  "cart/updateCart",
+  async (update) => {
+    const response = await updateCart(update);
+    return response.data;
+  }
+);
+
+export const deleteItemFromCartAsync = createAsyncThunk(
+  "cart/deleteItemFromCart",
+  async (itemId) => {
+    const response = await deleteItemFromCart(itemId);
+    return response.data;
+  }
+);
+
+export const resetCartAsync = createAsyncThunk(
+  "cart/resetCart",
+  async (userId) => {
+    const response = await resetCart(userId);
+    return response.data;
+  }
+);
+
+// Cart Slice
 export const CartSlice = createSlice({
   name: "cart",
   initialState,
-  reducers: {},
+  reducers: {
+    clearCart: (state) => {
+      state.items = [];
+    },
+    
+  },
   extraReducers: (builder) => {
     builder
       .addCase(addToCartAsync.pending, (state) => {
@@ -76,7 +80,6 @@ export const CartSlice = createSlice({
         state.status = "idle";
         state.items = action.payload;
       })
-      // for update cart
       .addCase(updateCartAsync.pending, (state) => {
         state.status = "loading";
       })
@@ -85,9 +88,10 @@ export const CartSlice = createSlice({
         const index = state.items.findIndex(
           (item) => item.id === action.payload.id
         );
-        state.items[index] = action.payload;
+        if (index !== -1) {
+          state.items[index] = action.payload;
+        }
       })
-      // remove form cart
       .addCase(deleteItemFromCartAsync.pending, (state) => {
         state.status = "loading";
       })
@@ -96,18 +100,21 @@ export const CartSlice = createSlice({
         const index = state.items.findIndex(
           (item) => item.id === action.payload.id
         );
-        state.items.splice(index, 1);
+        if (index !== -1) {
+          state.items.splice(index, 1);
+        }
       })
-      // for rest cart
       .addCase(resetCartAsync.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(resetCartAsync.fulfilled, (state, action) => {
+      .addCase(resetCartAsync.fulfilled, (state) => {
         state.status = "idle";
-        state.items=[];
+        state.items = [];
       });
   },
 });
+
+export const { clearCart } = CartSlice.actions;
 
 export const selectCartItems = (state) => state.cart.items;
 

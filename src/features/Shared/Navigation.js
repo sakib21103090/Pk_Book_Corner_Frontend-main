@@ -1,33 +1,19 @@
-import React, { useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { RxDropdownMenu } from "react-icons/rx";
 import logo from "../../assets/logo/mainlogo.png";
 import loginLogo from "../../assets/logo/userloginlogo.png";
-// import { AuthContext } from '../../Providers/AuthProviders';
-import Swal from "sweetalert2";
 import { ShoppingCartIcon } from "@heroicons/react/20/solid";
 import { useSelector } from "react-redux";
 import { selectCartItems } from "../Cart/CartSlice";
 import { selectLoginInUser } from "../Auth/Components/AuthSlice";
+import { selectUserInfo } from "../UserPannel/User/UserSlice";
 
 const Navigation = () => {
-  const items = useSelector(selectCartItems);
-  // const {user,logOut}=useContext(AuthContext);
   const user = useSelector(selectLoginInUser);
-  const logOut = "";
-  {
-    /* get user information which user are login*/
-  }
-
-  const handleLogOut = () => {
-    // logOut()
-
-    // .then(() => {
-    //   Swal.fire('Hey', 'Logout successful', 'success');
-    // })
-    //     .catch(error => console.log(error));
-    console.log("vajoiaweur");
-  };
+  const items = useSelector(selectCartItems);
+ 
+ 
+ 
 
   return (
     <div className="navbar  max-w-screen-2xl mx-auto  bg-cyan-200">
@@ -130,10 +116,10 @@ const Navigation = () => {
             className="btn btn-ghost btn-circle avatar"
           >
             <div className="w-11 rounded-full">
-              {user ? (
+              {user ?(
                 <img
                   className="rounded-full w-[50px] m-0 p-0"
-                  src={user.photoURL}
+                  src={user?.photo}
                 />
               ) : (
                 <img

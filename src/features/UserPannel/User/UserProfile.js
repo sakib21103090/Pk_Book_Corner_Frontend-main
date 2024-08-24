@@ -6,6 +6,7 @@ import { useState } from "react";
 export default function UserProfile() {
   const dispatch = useDispatch();
   const user = useSelector(selectUserInfo);
+  console.log(user)
   const [selectedEditIndex, setSelectedEditIndex] = useState(-1);
   const {
     register,
@@ -34,7 +35,7 @@ export default function UserProfile() {
       <div className="text-center">
         <img
           className="mx-auto h-24 w-24 rounded-full border-4 border-indigo-500 shadow-lg"
-          src={user?.photoUrl}
+          src={user?.photo}
           alt="User"
         />
         <h2 className="mt-6 text-3xl font-bold text-indigo-900">

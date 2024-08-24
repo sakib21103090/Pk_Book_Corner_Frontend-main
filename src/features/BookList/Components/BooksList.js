@@ -7,9 +7,10 @@ import {
   FunnelIcon,
   Squares2X2Icon,
   MagnifyingGlassIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
 } from "@heroicons/react/20/solid";
 import {
-  fetchAllProductsAsync,
   fetchAuthorNameAsync,
   fetchCategoryAsync,
   fetchProductsByFiltersAsync,
@@ -45,7 +46,9 @@ export default function BooksList() {
   const [filter, setFilter] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [isMobileFilterVisible, setIsMobileFilterVisible] = useState(false); // New state
+  const [isMobileFilterVisible, setIsMobileFilterVisible] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage] = useState(9);
 
   const handleFilter = (sectionId, value) => {
     const newFilter = { ...filter };
@@ -55,16 +58,19 @@ export default function BooksList() {
       delete newFilter[sectionId];
     }
     setFilter(newFilter);
+    setCurrentPage(1);
   };
 
   const handleSort = (e, option) => {
     const sort = { _sort: option.sort, _order: option.order };
     setSort(sort);
+    setCurrentPage(1);
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
     filterProducts();
+    setCurrentPage(1);
   };
 
   const filterProducts = () => {
@@ -93,7 +99,20 @@ export default function BooksList() {
   }, [products, searchTerm]);
 
   const toggleMobileFilter = () => {
-    setIsMobileFilterVisible((prev) => !prev); // Toggle filter visibility
+    setIsMobileFilterVisible((prev) => !prev);
+  };
+
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
   return (
@@ -181,7 +200,7 @@ export default function BooksList() {
                 <button
                   type="button"
                   className="-m-2 ml-4 p-2 text-gray-400 hover:text-gray-500 sm:ml-6"
-                  onClick={toggleMobileFilter} // Toggle filter panel
+                  onClick={toggleMobileFilter}
                 >
                   <FunnelIcon className="h-5 w-5" aria-hidden="true" />
                 </button>
@@ -194,7 +213,6 @@ export default function BooksList() {
               </h2>
 
               <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
-                {/* Mobile Filter */}
                 {isMobileFilterVisible && (
                   <MobileFilter
                     handleFilter={handleFilter}
@@ -203,8 +221,7 @@ export default function BooksList() {
                     toggleMobileFilter={toggleMobileFilter}
                   />
                 )}
-                
-                {/* Desktop Filter */}
+
                 <DesktopFilter
                   handleFilter={handleFilter}
                   authorName={authorName}
@@ -213,9 +230,62 @@ export default function BooksList() {
 
                 <div className="lg:col-span-3">
                   <div className="bg-white">
-                    <BooksCard products={filteredProducts} />
+                    <BooksCard products={currentProducts} />
                   </div>
                 </div>
+              </div>
+
+              {/* Pagination */}
+              <div className="flex justify-end mt-8">
+                <nav aria-label="Page navigation">
+                  <ul className="inline-flex -space-x-px">
+                    <li>
+                      <button
+                        disabled={currentPage === 1}
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        className={`px-3 py-2 ml-0 leading-tight border rounded-l-lg ${
+                          currentPage === 1
+                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                            : "bg-black text-white hover:bg-gray-700"
+                        }`}
+                      >
+                        <span className="sr-only">Previous</span>
+                        <ChevronLeftIcon className="w-5 h-5" />
+                      </button>
+                    </li>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (page) => (
+                        <li key={page}>
+                          <button
+                            onClick={() => handlePageChange(page)}
+                            className={classNames(
+                              "px-3 py-2 leading-tight border transition-all duration-200",
+                              currentPage === page
+                                ? "bg-black text-white shadow-lg transform scale-105"
+                                : "bg-gray-300 text-gray-700 hover:bg-gray-400"
+                            )}
+                          >
+                            {page}
+                          </button>
+                        </li>
+                      )
+                    )}
+                    <li>
+                      <button
+                        disabled={currentPage === totalPages}
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        className={`px-3 py-2 leading-tight border rounded-r-lg ${
+                          currentPage === totalPages
+                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                            : "bg-black text-white hover:bg-gray-700"
+                        }`}
+                      >
+                        <span className="sr-only">Next</span>
+                        <ChevronRightIcon className="w-5 h-5" />
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
               </div>
             </section>
           </main>
@@ -230,7 +300,10 @@ function DesktopFilter({ handleFilter, authorName, category }) {
     <div className="hidden lg:block">
       <div className="space-y-6">
         <div>
-          <label htmlFor="author" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="author"
+            className="block text-sm font-medium text-gray-700"
+          >
             Author
           </label>
           <select
@@ -248,7 +321,10 @@ function DesktopFilter({ handleFilter, authorName, category }) {
           </select>
         </div>
         <div>
-          <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="category"
+            className="block text-sm font-medium text-gray-700"
+          >
             Category
           </label>
           <select
@@ -270,7 +346,12 @@ function DesktopFilter({ handleFilter, authorName, category }) {
   );
 }
 
-function MobileFilter({ handleFilter, authorName, category, toggleMobileFilter }) {
+function MobileFilter({
+  handleFilter,
+  authorName,
+  category,
+  toggleMobileFilter,
+}) {
   return (
     <div className="lg:hidden fixed top-0 left-0 w-64 bg-white p-4 shadow-lg rounded-r-lg h-full z-50 transition-transform transform">
       <button
@@ -281,7 +362,10 @@ function MobileFilter({ handleFilter, authorName, category, toggleMobileFilter }
       </button>
       <div className="flex flex-col space-y-6">
         <div>
-          <label htmlFor="author-mobile" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="author-mobile"
+            className="block text-sm font-medium text-gray-700"
+          >
             Author
           </label>
           <select
@@ -299,7 +383,10 @@ function MobileFilter({ handleFilter, authorName, category, toggleMobileFilter }
           </select>
         </div>
         <div>
-          <label htmlFor="category-mobile" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="category-mobile"
+            className="block text-sm font-medium text-gray-700"
+          >
             Category
           </label>
           <select
@@ -322,16 +409,10 @@ function MobileFilter({ handleFilter, authorName, category, toggleMobileFilter }
 }
 
 function BooksCard({ products }) {
-  const [visibleProducts, setVisibleProducts] = useState(6);
-
-  const showMoreProducts = () => {
-    setVisibleProducts((prevVisible) => prevVisible + 6);
-  };
-
   return (
     <div className="mx-auto max-w-2xl px-4 py-0 sm:px-6 sm:py-0 lg:max-w-7xl lg:px-8">
       <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
-        {products.slice(0, visibleProducts).map((product) => (
+        {products.map((product) => (
           <Link to={`/booksinfopage/${product.id}`} key={product.id}>
             <div className="group relative border-solid h-[480px] border-2 p-2 bg-gradient-to-br  from-cyan-50 to-gray-100 border--200">
               <div className="w-full h-[380px] overflow-hidden rounded-md bg-gray-200 ">
@@ -369,7 +450,8 @@ function BooksCard({ products }) {
                           (
                             (product.price * product.discountPercentage) /
                             100
-                          ).toFixed(0)}Tk
+                          ).toFixed(0)}
+                        Tk
                       </p>
                     </div>
                   ) : (
@@ -383,17 +465,6 @@ function BooksCard({ products }) {
           </Link>
         ))}
       </div>
-      {visibleProducts < products.length && (
-        <div className="mt-8 flex justify-center">
-          <button
-            onClick={showMoreProducts}
-            className="mt-10  relative inline-flex items-center justify-center px-8 py-3 overflow-hidden font-medium text-black bg-cyan-500 rounded-lg group"
-          >
-            <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-green-500 rounded-full group-hover:w-56 group-hover:h-56"></span>
-            <span className="relative">Show More</span>
-          </button>
-        </div>
-      )}
     </div>
   );
 }

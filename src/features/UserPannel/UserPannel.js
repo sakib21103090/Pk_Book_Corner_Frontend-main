@@ -68,6 +68,30 @@ function UserPannel() {
                 </li>
                 <li className="mb-6">
                   <NavLink
+                    to="/pannelPage/addCategory"
+                    className={({ isActive }) =>
+                      isActive
+                        ? "text-black text-lg font-bold border-b-[4px] border-blue-900 "
+                        : "text-black font-bold text-lg "
+                    }
+                  >
+                    Add A Category
+                  </NavLink>
+                </li>
+                <li className="mb-6">
+                  <NavLink
+                    to="/pannelPage/addAuthor"
+                    className={({ isActive }) =>
+                      isActive
+                        ? "text-black text-lg font-bold border-b-[4px] border-blue-900 "
+                        : "text-black font-bold text-lg "
+                    }
+                  >
+                    Add A addAuthor
+                  </NavLink>
+                </li>
+                <li className="mb-6">
+                  <NavLink
                     to="/pannelPage/manageProduct"
                     className={({ isActive }) =>
                       isActive
